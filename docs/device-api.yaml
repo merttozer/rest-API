@@ -1,0 +1,359 @@
+openapi: 3.0.0
+info:
+  title: Device Registry API
+  description: RESTful API for managing devices and locations in a factory environment.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Development server
+
+paths:
+  /devices:
+    get:
+      summary: List all devices
+      description: Retrieve a list of all devices with optional filters.
+      parameters:
+        - name: name
+          in: query
+          description: Filter by device name
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: Filter by device type
+          schema:
+            type: string
+        - name: serial_number
+          in: query
+          description: Filter by serial number
+          schema:
+            type: string
+        - name: creation_date_start
+          in: query
+          description: Filter by creation date start range
+          schema:
+            type: string
+        - name: creation_date_end
+          in: query
+          description: Filter by creation date end range
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Filter by location name
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+              examples:
+                deviceListExample:
+                  value:
+                    - id: 1
+                      name: "Hydrophone"
+                      type: "Sensor"
+                      serial_number: "MO-S001"
+                      creation_date: "2023-11-26"
+                      location_id: 101
+                    - id: 2
+                      name: "Hydraulic"
+                      type: "Actuator"
+                      serial_number: "MO-A001"
+                      creation_date: "2023-11-26"
+                      location_id: 102
+        '204':
+          description: No Content
+    post:
+      summary: Create a new device
+      description: Add a new device to the registry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+            examples:
+              createDeviceExample:
+                value:
+                  name: "Microphone"
+                  type: "Sensor"
+                  serial_number: "MO-S002"
+                  creation_date: "2023-11-24"
+                  location_id: 103
+      responses:
+        '201':
+          description: Device added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /devices/{id}:
+    get:
+      summary: Get a device by ID
+      description: Fetches details of a specific device.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed information of a specific device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    put:
+      summary: Update a device
+      description: Update details of an existing device.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '500':
+          description: Failed to update device
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    delete:
+      summary: Delete a device
+      description: Removes a device from the registry.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Device deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Device not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /locations:
+    get:
+      summary: List all locations
+      description: Retrieve a list of all locations.
+      responses:
+        '200':
+          description: A list of locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+              examples:
+                locationListExample:
+                  value:
+                    - id: 1
+                      name: "DSP-Lab"
+                      type: "LAB"
+                    - id: 2
+                      name: "Main-Office"
+                      type: "Office"
+        '204':
+          description: No Content
+    post:
+      summary: Create a new location
+      description: Add a new location to the registry.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+            examples:
+              createLocationExample:
+                value:
+                  name: "Main-Office"
+                  type: "Office"
+      responses:
+        '201':
+          description: Location added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+  /locations/{id}:
+    get:
+      summary: Get a location by ID
+      description: Fetches details of a specific location.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detailed information of a specific location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    put:
+      summary: Update a location
+      description: Update details of an existing location.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '200':
+          description: Location updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '500':
+          description: Failed to update location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+    delete:
+      summary: Delete a location
+      description: Removes a location from the registry.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Location deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '404':
+          description: Location not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        serial_number:
+          type: string
+        creation_date:
+          type: string
+        location_id:
+          type: integer
+      example:
+        id: 1
+        name: "Seismometer"
+        type: "Sensor"
+        serial_number: "MO-S004"
+        creation_date: "2023-08-23"
+        location_id: 202
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+      example:
+        id: 10
+        name: "DSP-Lab"
+        type: "LAB"
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+          description: A brief description of the error that occurred.
+      example:
+        message: "Device added successfully."
+
+    ErrorMessage:
+      type: object
+      properties:
+        error:
+          type: string
+          description: A brief message indicating the success of the operation.
+      example:
+        error: "Failed to add device."
